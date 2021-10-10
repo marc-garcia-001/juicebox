@@ -1,5 +1,6 @@
 const express = require("express");
 const apiRouter = express.Router();
+
 const usersRouter = require("./users");
 const postsRouter = require("./posts");
 const tagsRouter = require("./tags");
@@ -13,7 +14,6 @@ apiRouter.use(async (req, res, next) => {
   const auth = req.header("Authorization");
 
   if (!auth) {
-  
     next();
   } else if (auth.startsWith(prefix)) {
     const token = auth.slice(prefix.length);
@@ -40,8 +40,17 @@ apiRouter.use("/users", usersRouter);
 apiRouter.use("/posts", postsRouter);
 apiRouter.use("/tags", tagsRouter);
 
+apiRouter.use((req, res, next) => {
+  if (req.user) {
+    console.log("User is set:", req.user);
+  }
+
+  next();
+});
+
 apiRouter.use((error, req, res, next) => {
-	res.send(error);
-      });
+  console.log("error", error);
+  res.send(error);
+});
 
 module.exports = apiRouter;
